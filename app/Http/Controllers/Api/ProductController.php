@@ -13,7 +13,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('name')
             ->get();
 
         return response()->json($products);
@@ -25,58 +25,78 @@ class ProductController extends Controller
         $data = $request->validate([
             'name'        => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
+            'price'       => 'required|numeric|min:0',      // harga jual
+            'cost_price'  => 'required|numeric|min:0',      // harga modal
             'stock'       => 'required|integer|min:0',
-            'price'       => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'image'       => 'nullable|image|max:2048',
         ]);
 
+        $imagePath = null;
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $data['image_path'] = $path;
+            $imagePath = $request->file('image')->store('products', 'public');
         }
 
-        $product = Product::create($data);
+        $product = Product::create([
+            'name'        => $data['name'],
+            'category_id' => $data['category_id'] ?? null,
+            'price'       => $data['price'],
+            'cost_price'  => $data['cost_price'],
+            'stock'       => $data['stock'],
+            'description' => $data['description'] ?? null,
+            'image_path'  => $imagePath,
+        ]);
 
-        return response()->json($product->load('category'), 201);
+        return response()->json($product, 201);
     }
 
-    // GET /api/products/{product}
-    public function show(Product $product)
+    // GET /api/products/{id}
+    public function show($id)
     {
-        return response()->json($product->load('category'));
+        $product = Product::with('category')->findOrFail($id);
+        return response()->json($product);
     }
 
-    // PUT /api/products/{product}
-    public function update(Request $request, Product $product)
+    // PUT /api/products/{id}
+    public function update(Request $request, $id)
     {
+        $product = Product::findOrFail($id);
+
         $data = $request->validate([
             'name'        => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
+            'price'       => 'required|numeric|min:0',      // harga jual
+            'cost_price'  => 'required|numeric|min:0',      // harga modal
             'stock'       => 'required|integer|min:0',
-            'price'       => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'image'       => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
-            // hapus foto lama
-            if ($product->image_path && Storage::disk('public')->exists($product->image_path)) {
+            // hapus foto lama kalau ada
+            if ($product->image_path) {
                 Storage::disk('public')->delete($product->image_path);
             }
-            $path = $request->file('image')->store('products', 'public');
-            $data['image_path'] = $path;
+            $product->image_path = $request->file('image')->store('products', 'public');
         }
 
-        $product->update($data);
+        $product->name        = $data['name'];
+        $product->category_id = $data['category_id'] ?? null;
+        $product->price       = $data['price'];
+        $product->cost_price  = $data['cost_price'];
+        $product->stock       = $data['stock'];
+        $product->description = $data['description'] ?? null;
+        $product->save();
 
-        return response()->json($product->load('category'));
+        return response()->json($product);
     }
 
-    // DELETE /api/products/{product}
-    public function destroy(Product $product)
+    // DELETE /api/products/{id}
+    public function destroy($id)
     {
-        if ($product->image_path && Storage::disk('public')->exists($product->image_path)) {
+        $product = Product::findOrFail($id);
+
+        if ($product->image_path) {
             Storage::disk('public')->delete($product->image_path);
         }
 

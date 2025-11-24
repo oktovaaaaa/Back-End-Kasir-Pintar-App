@@ -4,16 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 class Product extends Model
 {
     use HasFactory;
 
+    // PASTIKAN kolom-kolom ini ada SEMUA
     protected $fillable = [
         'name',
         'category_id',
+        'price',        // <— HARGA JUAL
+        'cost_price',   // <— HARGA MODAL
         'stock',
-        'price',
         'description',
         'image_path',
     ];
