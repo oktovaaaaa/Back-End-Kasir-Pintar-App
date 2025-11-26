@@ -45,9 +45,9 @@ class SaleController extends Controller
             'items.*.product_id'  => 'required|exists:products,id',
             'items.*.qty'         => 'required|integer|min:1',
 
-            'paid_amount'   => 'required|numeric|min:0',
-            'payment_method'=> 'nullable|string|max:50',
-            'note'          => 'nullable|string',
+            'paid_amount'    => 'required|numeric|min:0',
+            'payment_method' => 'nullable|string|max:50',
+            'note'           => 'nullable|string',
         ]);
 
         $userId = Auth::id();
@@ -73,9 +73,9 @@ class SaleController extends Controller
                     ]);
                 }
 
-                $price     = $product->price;        // harga jual
-                $costPrice = $product->cost_price;   // harga modal
-                $subtotal  = $price * $qty;          // total jual
+                $price     = $product->price;       // harga jual
+                $costPrice = $product->cost_price;  // harga modal
+                $subtotal  = $price * $qty;         // total jual
                 $total    += $subtotal;
 
                 $saleItemsData[] = [
@@ -127,15 +127,15 @@ class SaleController extends Controller
 
             // simpan header sale
             $sale = Sale::create([
-                'user_id'               => $userId,
-                'customer_id'           => $customerId,
-                'total_amount'          => $total,
-                'paid_amount'           => $paidAmount,
-                'change_amount'         => $changeAmount,
-                'status'                => $status,
-                'payment_method'        => $data['payment_method'] ?? null,
-                'customer_name_snapshot'=> $customerNameSnapshot,
-                'note'                  => $data['note'] ?? null,
+                'user_id'                => $userId,
+                'customer_id'            => $customerId,
+                'total_amount'           => $total,
+                'paid_amount'            => $paidAmount,
+                'change_amount'          => $changeAmount,
+                'status'                 => $status,
+                'payment_method'         => $data['payment_method'] ?? null,
+                'customer_name_snapshot' => $customerNameSnapshot,
+                'note'                   => $data['note'] ?? null,
             ]);
 
             // simpan detail items
@@ -148,6 +148,72 @@ class SaleController extends Controller
             $sale->load(['customer', 'items.product']);
 
             return response()->json($sale, 201);
+        });
+    }
+
+    /**
+     * POST /api/sales/{id}/pay-kasbon
+     * Melunasi / mencicil kasbon.
+     *
+     * Request:
+     *  - amount: nominal yang dibayar sekarang
+     */
+    public function payKasbon(Request $request, $id)
+    {
+        $data = $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        $userId = Auth::id();
+        if (!$userId) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        return DB::transaction(function () use ($id, $data) {
+            /** @var Sale $sale */
+            $sale = Sale::lockForUpdate()->findOrFail($id);
+
+            if ($sale->status !== 'kasbon') {
+                throw ValidationException::withMessages([
+                    'sale' => ['Transaksi ini sudah lunas, tidak bisa dibayar lagi.'],
+                ]);
+            }
+
+            $remaining = $sale->total_amount - $sale->paid_amount;
+
+            if ($remaining <= 0) {
+                throw ValidationException::withMessages([
+                    'amount' => ['Kasbon sudah lunas.'],
+                ]);
+            }
+
+            $amount = (float) $data['amount'];
+
+            if ($amount > $remaining) {
+                throw ValidationException::withMessages([
+                    'amount' => ['Nominal tidak boleh melebihi sisa kasbon (' . $remaining . ').'],
+                ]);
+            }
+
+            // update nominal
+            $sale->paid_amount += $amount;
+            // untuk kasbon tidak ada kembalian, jadi 0
+            $sale->change_amount = 0;
+
+            if ($sale->paid_amount >= $sale->total_amount) {
+                $sale->status = 'paid';
+            }
+
+            $sale->save();
+            $sale->refresh();
+
+            $newRemaining = max(0, $sale->total_amount - $sale->paid_amount);
+
+            return response()->json([
+                'message'   => 'Pembayaran kasbon berhasil disimpan.',
+                'sale'      => $sale->load(['customer', 'items.product']),
+                'remaining' => $newRemaining,
+            ]);
         });
     }
 }

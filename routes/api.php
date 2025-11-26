@@ -37,22 +37,26 @@ Route::middleware('auth:sanctum')->group(function () {
     // produk dengan foto
     Route::apiResource('products', ProductController::class);
 
-    // pelanggan (untuk picker nanti)
+    // pelanggan
     Route::get('customers', [CustomerController::class, 'index']);
     Route::post('customers', [CustomerController::class, 'store']);
     Route::get('customers/{id}', [CustomerController::class, 'show']);
     Route::put('customers/{id}', [CustomerController::class, 'update']);
     Route::delete('customers/{id}', [CustomerController::class, 'destroy']);
 
+
+// routes/api.php (di dalam group auth:sanctum)
+Route::post('sales/{sale}/pay', [SaleController::class, 'payKasbon']);
+
+
     // transaksi penjualan
     Route::get('sales', [SaleController::class, 'index']);   // riwayat
     Route::post('sales', [SaleController::class, 'store']);  // buat transaksi baru
     Route::get('sales/{id}', [SaleController::class, 'show']);
-    Route::post('products/{id}', [ProductController::class, 'update']); // pakai _method=PUT
-    Route::delete('products/{id}', [ProductController::class, 'destroy']); // <== penting
+    Route::post('products/{id}', [ProductController::class, 'update']); // update
+    Route::delete('products/{id}', [ProductController::class, 'destroy']); // haous
 
-    // Laporan keuntungan & kasbon
-
+    // laporan keuntungan & utang
     Route::get('/reports/profit', [ReportController::class, 'profitSummary']);
     Route::get('/reports/profit-by-product', [ReportController::class, 'profitByProduct']);
     Route::get('/reports/profit-by-category', [ReportController::class, 'profitByCategory']);

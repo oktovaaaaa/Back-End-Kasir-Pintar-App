@@ -11,7 +11,7 @@ class ReportController extends Controller
 {
     /**
      * Helper: hitung start date berdasarkan mode periode (today/7 hari/30 hari/1 tahun)
-     * Di sini aku pakai pendekatan:
+     * Di sini pakai pendekatan:
      * - daily   ->  7 hari terakhir
      * - weekly  ->  12 minggu terakhir
      * - monthly ->  12 bulan terakhir
@@ -133,8 +133,6 @@ class ReportController extends Controller
     /**
      * Keuntungan per kategori untuk suatu range waktu.
      * GET /api/reports/profit-by-category?period=daily|weekly|monthly|yearly
-     *
-     * Output sama seperti sebelumnya + filtered by date range.
      */
     public function profitByCategory(Request $request)
     {
@@ -163,17 +161,6 @@ class ReportController extends Controller
     /**
      * TIMESERIES keuntungan 1 produk (dipakai saat card produk di-tap).
      * GET /api/reports/product/{productId}/timeline?period=daily|weekly|monthly|yearly
-     *
-     * Output:
-     * [
-     *   {
-     *     "period_label": "2025-11-01 00:00:00",
-     *     "total_profit": 20000,
-     *     "total_sales":  150000,
-     *     "total_qty":    12
-     *   },
-     *   ...
-     * ]
      */
     public function productTimeline(Request $request, int $productId)
     {
