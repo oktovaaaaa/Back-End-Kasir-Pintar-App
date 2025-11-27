@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Product extends Model
 {
     use HasFactory;
@@ -24,6 +25,12 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    // === TAMBAHAN: relasi ke sale_items ===
+    public function saleItems()
+    {
+        return $this->hasMany(\App\Models\SaleItem::class);
     }
 
     // agar Flutter dapat URL lengkap untuk foto

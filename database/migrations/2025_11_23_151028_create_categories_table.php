@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name');              // contoh: Minuman, Snack
+            $table->string('name');             
             $table->text('description')->nullable();
             $table->timestamps();
         });

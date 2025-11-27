@@ -8,7 +8,6 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\ReportController;
 
-
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES
@@ -31,11 +30,14 @@ Route::prefix('auth')->group(function () {
 */
 Route::middleware('auth:sanctum')->group(function () {
 
-    // kategori (untuk dropdown di Flutter)
+    // kategori
     Route::apiResource('categories', CategoryController::class)->except(['show']);
 
-    // produk dengan foto
+    // produk
     Route::apiResource('products', ProductController::class);
+    // (yang dua ini sebenarnya double, tapi kalau mau biarin dulu juga nggak apa2)
+    Route::post('products/{id}', [ProductController::class, 'update']);
+    Route::delete('products/{id}', [ProductController::class, 'destroy']);
 
     // pelanggan
     Route::get('customers', [CustomerController::class, 'index']);
@@ -44,17 +46,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('customers/{id}', [CustomerController::class, 'update']);
     Route::delete('customers/{id}', [CustomerController::class, 'destroy']);
 
-
-// routes/api.php (di dalam group auth:sanctum)
-Route::post('sales/{sale}/pay', [SaleController::class, 'payKasbon']);
-
-
     // transaksi penjualan
     Route::get('sales', [SaleController::class, 'index']);   // riwayat
     Route::post('sales', [SaleController::class, 'store']);  // buat transaksi baru
     Route::get('sales/{id}', [SaleController::class, 'show']);
-    Route::post('products/{id}', [ProductController::class, 'update']); // update
-    Route::delete('products/{id}', [ProductController::class, 'destroy']); // haous
+
+    // 🔵 INI YANG PENTING: route pelunasan kasbon
+    Route::post('sales/{id}/pay-kasbon', [SaleController::class, 'payKasbon']);
 
     // laporan keuntungan & utang
     Route::get('/reports/profit', [ReportController::class, 'profitSummary']);
@@ -63,5 +61,4 @@ Route::post('sales/{sale}/pay', [SaleController::class, 'payKasbon']);
     Route::get('/reports/product/{product}/timeline', [ReportController::class, 'productTimeline']);
     Route::get('/reports/category/{category}/timeline', [ReportController::class, 'categoryTimeline']);
     Route::get('/reports/kasbon', [ReportController::class, 'kasbonList']);
-
 });

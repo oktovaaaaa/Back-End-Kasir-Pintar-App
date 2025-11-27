@@ -158,62 +158,58 @@ class SaleController extends Controller
      * Request:
      *  - amount: nominal yang dibayar sekarang
      */
-    public function payKasbon(Request $request, $id)
-    {
-        $data = $request->validate([
-            'amount' => 'required|numeric|min:1',
-        ]);
+  public function payKasbon(Request $request, $id)
+{
+    $data = $request->validate([
+        'amount' => 'required|numeric|min:1',
+    ]);
 
-        $userId = Auth::id();
-        if (!$userId) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
+    $userId = Auth::id();
+    if (!$userId) {
+        return response()->json(['message' => 'Unauthenticated'], 401);
+    }
+
+    return DB::transaction(function () use ($id, $data) {
+        /** @var Sale $sale */
+        $sale = Sale::lockForUpdate()->findOrFail($id);
+
+        if ($sale->status !== 'kasbon') {
+            throw ValidationException::withMessages([
+                'sale' => ['Transaksi ini sudah lunas, tidak bisa dibayar lagi.'],
+            ]);
         }
 
-        return DB::transaction(function () use ($id, $data) {
-            /** @var Sale $sale */
-            $sale = Sale::lockForUpdate()->findOrFail($id);
-
-            if ($sale->status !== 'kasbon') {
-                throw ValidationException::withMessages([
-                    'sale' => ['Transaksi ini sudah lunas, tidak bisa dibayar lagi.'],
-                ]);
-            }
-
-            $remaining = $sale->total_amount - $sale->paid_amount;
-
-            if ($remaining <= 0) {
-                throw ValidationException::withMessages([
-                    'amount' => ['Kasbon sudah lunas.'],
-                ]);
-            }
-
-            $amount = (float) $data['amount'];
-
-            if ($amount > $remaining) {
-                throw ValidationException::withMessages([
-                    'amount' => ['Nominal tidak boleh melebihi sisa kasbon (' . $remaining . ').'],
-                ]);
-            }
-
-            // update nominal
-            $sale->paid_amount += $amount;
-            // untuk kasbon tidak ada kembalian, jadi 0
-            $sale->change_amount = 0;
-
-            if ($sale->paid_amount >= $sale->total_amount) {
-                $sale->status = 'paid';
-            }
-
-            $sale->save();
-            $sale->refresh();
-
-            $newRemaining = max(0, $sale->total_amount - $sale->paid_amount);
-
-            return response()->json([
-                'message'   => 'Pembayaran kasbon berhasil disimpan.',
-                'sale'      => $sale->load(['customer', 'items.product']),
-                'remaining' => $newRemaining,
+        $remaining = $sale->total_amount - $sale->paid_amount;
+        if ($remaining <= 0) {
+            throw ValidationException::withMessages([
+                'amount' => ['Kasbon sudah lunas.'],
             ]);
-        });
-    }
+        }
+
+        $amount = (float) $data['amount'];
+        if ($amount > $remaining) {
+            throw ValidationException::withMessages([
+                'amount' => ['Nominal tidak boleh melebihi sisa kasbon (' . $remaining . ').'],
+            ]);
+        }
+
+        $sale->paid_amount += $amount;
+        $sale->change_amount = 0;
+
+        if ($sale->paid_amount >= $sale->total_amount) {
+            $sale->status = 'paid';
+        }
+
+        $sale->save();
+        $sale->refresh();
+
+        $newRemaining = max(0, $sale->total_amount - $sale->paid_amount);
+
+        return response()->json([
+            'message'   => 'Pembayaran kasbon berhasil disimpan.',
+            'sale'      => $sale->load(['customer', 'items.product']),
+            'remaining' => $newRemaining,
+        ]);
+    });
+}
 }

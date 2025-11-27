@@ -1,33 +1,47 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    // GET /api/products
+    /**
+     * Tampil halaman stok + monitoring + shortcut CRUD
+     */
     public function index()
     {
-        $products = Product::with('category')
-            ->orderBy('name')
-            ->get();
+        $products   = Product::with('category')->orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
 
-        return response()->json($products);
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
-    // POST /api/products
+    /**
+     * Form tambah produk (admin)
+     */
+    public function create()
+    {
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.products.create', compact('categories'));
+    }
+
+    /**
+     * Simpan produk baru dari admin
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
             'name'        => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
-            'price'       => 'required|numeric|min:0',      // harga jual
-            'cost_price'  => 'required|numeric|min:0',      // harga modal
+            'price'       => 'required|numeric|min:0',
+            'cost_price'  => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
             'description' => 'nullable|string',
             'image'       => 'nullable|image|max:2048',
@@ -38,7 +52,7 @@ class ProductController extends Controller
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
-        $product = Product::create([
+        Product::create([
             'name'        => $data['name'],
             'category_id' => $data['category_id'] ?? null,
             'price'       => $data['price'],
@@ -48,26 +62,31 @@ class ProductController extends Controller
             'image_path'  => $imagePath,
         ]);
 
-        return response()->json($product, 201);
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Produk berhasil ditambahkan.');
     }
 
-    // GET /api/products/{id}
-    public function show($id)
+    /**
+     * Form edit produk
+     */
+    public function edit(Product $product)
     {
-        $product = Product::with('category')->findOrFail($id);
-        return response()->json($product);
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
-    // PUT /api/products/{id}
-    public function update(Request $request, $id)
+    /**
+     * Update produk dari admin
+     */
+    public function update(Request $request, Product $product)
     {
-        $product = Product::findOrFail($id);
-
         $data = $request->validate([
             'name'        => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
-            'price'       => 'required|numeric|min:0',      // harga jual
-            'cost_price'  => 'required|numeric|min:0',      // harga modal
+            'price'       => 'required|numeric|min:0',
+            'cost_price'  => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
             'description' => 'nullable|string',
             'image'       => 'nullable|image|max:2048',
@@ -89,19 +108,19 @@ class ProductController extends Controller
         $product->description = $data['description'] ?? null;
         $product->save();
 
-        return response()->json($product);
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Produk berhasil diperbarui.');
     }
 
-    // DELETE /api/products/{id}
-    public function destroy($id)
+    /**
+     * Hapus produk
+     */
+    public function destroy(Product $product)
     {
-        $product = Product::findOrFail($id);
-
         // CEK: kalau produk sudah pernah dipakai di transaksi, jangan dihapus
         if ($product->saleItems()->exists()) {
-            return response()->json([
-                'message' => 'Produk ini sudah pernah dipakai di transaksi dan tidak dapat dihapus.'
-            ], 409); // 409 Conflict
+            return back()->with('error', 'Produk ini sudah pernah dipakai di transaksi, sehingga tidak dapat dihapus. Untuk berhenti menjual, ubah stok atau nonaktifkan di aplikasi kasir.');
         }
 
         try {
@@ -111,12 +130,11 @@ class ProductController extends Controller
 
             $product->delete();
 
-            return response()->json(['message' => 'Product deleted']);
+            return redirect()
+                ->route('admin.products.index')
+                ->with('success', 'Produk berhasil dihapus.');
         } catch (QueryException $e) {
-            // fallback kalau masih ada constraint lain
-            return response()->json([
-                'message' => 'Produk tidak dapat dihapus karena masih terhubung dengan data lain.'
-            ], 409);
+            return back()->with('error', 'Produk tidak dapat dihapus karena masih terhubung dengan data lain.');
         }
     }
 }
