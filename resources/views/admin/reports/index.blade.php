@@ -1,3 +1,4 @@
+{{-- resources/views/admin/reports/index.blade.php --}}
 @extends('layouts.admin')
 
 @section('title', 'Laporan Keuangan - Kasir Resto')
@@ -87,26 +88,29 @@
                 </div>
             </div>
             <div class="p-5">
-                <canvas id="profitChart" class="w-full h-[260px]"></canvas>
+                {{-- Height fixed biar nggak membesar --}}
+                <div class="w-full max-w-4xl mx-auto h-64 md:h-72">
+                    <canvas id="profitChart" class="w-full h-full"></canvas>
+                </div>
             </div>
             <div class="px-5 pb-4">
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-xs">
                         <thead>
-                            <tr class="text-[10px] uppercase text-gray-400 border-b border-gray-100">
-                                <th class="py-2 text-left">Periode</th>
-                                <th class="py-2 text-right">Penjualan</th>
-                                <th class="py-2 text-right">Profit</th>
-                                <th class="py-2 text-right">Qty</th>
-                                <th class="py-2 text-right">Trx</th>
-                            </tr>
+                        <tr class="text-[10px] uppercase text-gray-400 border-b border-gray-100">
+                            <th class="py-2 text-left">Periode</th>
+                            <th class="py-2 text-right">Penjualan</th>
+                            <th class="py-2 text-right">Profit</th>
+                            <th class="py-2 text-right">Qty</th>
+                            <th class="py-2 text-right">Trx</th>
+                        </tr>
                         </thead>
                         <tbody id="profit-summary-body">
-                            <tr>
-                                <td colspan="5" class="py-4 text-center text-gray-400">
-                                    Memuat data...
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="5" class="py-4 text-center text-gray-400">
+                                Memuat data...
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -156,19 +160,19 @@
             <div class="max-h-80 overflow-y-auto">
                 <table class="min-w-full text-xs">
                     <thead>
-                        <tr class="bg-gray-50 text-[10px] uppercase text-gray-400">
-                            <th class="px-4 py-2 text-left">Produk</th>
-                            <th class="px-4 py-2 text-right">Qty</th>
-                            <th class="px-4 py-2 text-right">Omzet</th>
-                            <th class="px-4 py-2 text-right">Profit</th>
-                        </tr>
+                    <tr class="bg-gray-50 text-[10px] uppercase text-gray-400">
+                        <th class="px-4 py-2 text-left">Produk</th>
+                        <th class="px-4 py-2 text-right">Qty</th>
+                        <th class="px-4 py-2 text-right">Omzet</th>
+                        <th class="px-4 py-2 text-right">Profit</th>
+                    </tr>
                     </thead>
                     <tbody id="profit-by-product-body">
-                        <tr>
-                            <td colspan="4" class="px-4 py-4 text-center text-gray-400">
-                                Memuat data...
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-4 text-center text-gray-400">
+                            Memuat data...
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -190,19 +194,19 @@
             <div class="max-h-80 overflow-y-auto">
                 <table class="min-w-full text-xs">
                     <thead>
-                        <tr class="bg-gray-50 text-[10px] uppercase text-gray-400">
-                            <th class="px-4 py-2 text-left">Kategori</th>
-                            <th class="px-4 py-2 text-right">Qty</th>
-                            <th class="px-4 py-2 text-right">Omzet</th>
-                            <th class="px-4 py-2 text-right">Profit</th>
-                        </tr>
+                    <tr class="bg-gray-50 text-[10px] uppercase text-gray-400">
+                        <th class="px-4 py-2 text-left">Kategori</th>
+                        <th class="px-4 py-2 text-right">Qty</th>
+                        <th class="px-4 py-2 text-right">Omzet</th>
+                        <th class="px-4 py-2 text-right">Profit</th>
+                    </tr>
                     </thead>
                     <tbody id="profit-by-category-body">
-                        <tr>
-                            <td colspan="4" class="px-4 py-4 text-center text-gray-400">
-                                Memuat data...
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="4" class="px-4 py-4 text-center text-gray-400">
+                            Memuat data...
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -220,23 +224,81 @@
         <div class="overflow-x-auto">
             <table class="min-w-full text-xs">
                 <thead>
-                    <tr class="bg-gray-50 text-[10px] uppercase text-gray-400">
-                        <th class="px-4 py-2 text-left">Pelanggan</th>
-                        <th class="px-4 py-2 text-right">Total</th>
-                        <th class="px-4 py-2 text-right">Dibayar</th>
-                        <th class="px-4 py-2 text-right">Sisa</th>
-                        <th class="px-4 py-2 text-left">Tanggal</th>
-                        <th class="px-4 py-2 text-center">Status</th>
-                    </tr>
+                <tr class="bg-gray-50 text-[10px] uppercase text-gray-400">
+                    <th class="px-4 py-2 text-left">Pelanggan</th>
+                    <th class="px-4 py-2 text-right">Total</th>
+                    <th class="px-4 py-2 text-right">Dibayar</th>
+                    <th class="px-4 py-2 text-right">Sisa</th>
+                    <th class="px-4 py-2 text-left">Tanggal</th>
+                    <th class="px-4 py-2 text-center">Status</th>
+                    <th class="px-4 py-2 text-center">Aksi</th> {{-- kolom baru --}}
+                </tr>
                 </thead>
                 <tbody id="kasbon-body">
-                    <tr>
-                        <td colspan="6" class="px-4 py-4 text-center text-gray-400">
-                            Memuat data kasbon...
-                        </td>
-                    </tr>
+                <tr>
+                    <td colspan="7" class="px-4 py-4 text-center text-gray-400">
+                        Memuat data kasbon...
+                    </td>
+                </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    {{-- ========= MODAL BAYAR KASBON (SAMA SEPERTI DI PELANGGAN) ========= --}}
+    <div id="payKasbonModal"
+         class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+        <div class="bg-white rounded-3xl shadow-xl w-full max-w-md mx-4 md:mx-0 p-6 md:p-7">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">
+                        Bayar Kasbon
+                    </h3>
+                    <p id="payKasbonInfo" class="text-xs text-slate-500">
+                        <!-- filled by JS -->
+                    </p>
+                </div>
+                <button type="button" id="btnClosePayKasbon"
+                        class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                    <i class="bx bx-x text-xl"></i>
+                </button>
+            </div>
+
+            <form id="payKasbonForm" class="text-sm">
+                @csrf
+                <input type="hidden" id="paySaleId" value="">
+                <input type="hidden" id="payRemainingRaw" value="0">
+
+                <div class="mb-4">
+                    <div class="flex justify-between text-xs mb-1 text-slate-600">
+                        <span>Sisa kasbon</span>
+                        <span id="payRemainingLabel" class="font-semibold text-red-600"></span>
+                    </div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                        Nominal bayar
+                    </label>
+                    <input type="number" id="payAmount" name="amount" min="1"
+                           class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-200 focus:border-sky-400"
+                           placeholder="Masukkan nominal bayar">
+                    <p class="mt-1 text-[11px] text-slate-500">
+                        Nilai awal otomatis sesuai sisa kasbon, tapi bisa dikurangi
+                        (misalnya pelanggan hanya bayar sebagian).
+                    </p>
+                    <p id="payKasbonError" class="mt-1 text-[11px] text-red-500 hidden"></p>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-4">
+                    <button type="button" id="btnCancelPayKasbon"
+                            class="px-4 py-2 rounded-full text-slate-500 hover:bg-slate-100 text-sm">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="px-5 py-2 rounded-full font-semibold text-white shadow-sm text-sm"
+                            style="background-color: #57A0D3;">
+                        Simpan Pembayaran
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
@@ -534,14 +596,15 @@
             tbody.innerHTML = html;
         }
 
+        // ========= KASBON + BAYAR KASBON =========
         async function loadKasbon() {
             const tbody = document.getElementById('kasbon-body');
-            tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-4 text-center text-gray-400">Memuat data kasbon...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-4 text-center text-gray-400">Memuat data kasbon...</td></tr>`;
 
             const data = await fetchJson(`{{ route('admin.reports.kasbon') }}`);
 
             if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-4 text-center text-gray-400">Tidak ada kasbon berjalan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-4 text-center text-gray-400">Tidak ada kasbon berjalan.</td></tr>`;
                 return;
             }
 
@@ -575,11 +638,130 @@
                                 ${remain > 0 ? 'Belum Lunas' : 'Lunas'}
                             </span>
                         </td>
+                        <td class="px-4 py-2 text-[11px] text-center">
+                            ${
+                                remain > 0
+                                    ? `<button type="button"
+                                            class="btn-open-pay px-3 py-1.5 rounded-full bg-[#57A0D3]/10 text-[#57A0D3] font-semibold hover:bg-[#57A0D3]/20"
+                                            data-sale-id="${row.id}"
+                                            data-customer-name="${row.customer_name ?? '-'}"
+                                            data-total="${total}"
+                                            data-paid="${paid}"
+                                            data-remaining="${remain}">
+                                            Bayar
+                                       </button>`
+                                    : '<span class="text-[10px] text-gray-400">-</span>'
+                            }
+                        </td>
                     </tr>
                 `;
             });
 
             tbody.innerHTML = html;
+
+            // Attach listener ke semua tombol Bayar
+            document.querySelectorAll('.btn-open-pay').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const saleId   = this.dataset.saleId;
+                    const remaining = Number(this.dataset.remaining);
+                    const total = Number(this.dataset.total);
+                    const paid  = Number(this.dataset.paid);
+                    const customerName = this.dataset.customerName || '-';
+                    openPayKasbonModal(saleId, total, paid, remaining, customerName);
+                });
+            });
+        }
+
+        // ==== MODAL BAYAR KASBON (logic hampir sama dgn halaman pelanggan) ====
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        const payKasbonModal = document.getElementById('payKasbonModal');
+        const btnClosePayKasbon = document.getElementById('btnClosePayKasbon');
+        const btnCancelPayKasbon = document.getElementById('btnCancelPayKasbon');
+        const payKasbonInfo = document.getElementById('payKasbonInfo');
+        const paySaleIdInput = document.getElementById('paySaleId');
+        const payRemainingRaw = document.getElementById('payRemainingRaw');
+        const payRemainingLabel = document.getElementById('payRemainingLabel');
+        const payAmountInput = document.getElementById('payAmount');
+        const payKasbonError = document.getElementById('payKasbonError');
+        const payKasbonForm = document.getElementById('payKasbonForm');
+
+        function openPayKasbonModal(saleId, total, paid, remaining, customerName) {
+            paySaleIdInput.value = saleId;
+            payRemainingRaw.value = remaining;
+            payAmountInput.value = remaining; // default = sisa kasbon
+            payRemainingLabel.textContent = formatCurrency(remaining);
+            payKasbonInfo.textContent =
+                `Pelanggan: ${customerName} • Total ${formatCurrency(total)} • Sudah dibayar ${formatCurrency(paid)}`;
+            payKasbonError.classList.add('hidden');
+            payKasbonError.textContent = '';
+
+            payKasbonModal.classList.remove('hidden');
+            payKasbonModal.classList.add('flex');
+            payAmountInput.focus();
+        }
+
+        function closePayKasbonModal() {
+            payKasbonModal.classList.add('hidden');
+            payKasbonModal.classList.remove('flex');
+        }
+
+        if (btnClosePayKasbon) btnClosePayKasbon.addEventListener('click', closePayKasbonModal);
+        if (btnCancelPayKasbon) btnCancelPayKasbon.addEventListener('click', closePayKasbonModal);
+
+        if (payKasbonForm) {
+            payKasbonForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const saleId = paySaleIdInput.value;
+                const remaining = Number(payRemainingRaw.value);
+                const amount = Number(payAmountInput.value || 0);
+
+                payKasbonError.classList.add('hidden');
+                payKasbonError.textContent = '';
+
+                if (amount <= 0) {
+                    payKasbonError.textContent = 'Nominal bayar harus lebih dari 0.';
+                    payKasbonError.classList.remove('hidden');
+                    return;
+                }
+                if (amount > remaining) {
+                    payKasbonError.textContent = 'Nominal tidak boleh melebihi sisa kasbon.';
+                    payKasbonError.classList.remove('hidden');
+                    return;
+                }
+
+                fetch("{{ url('admin/kasbon') }}/" + saleId + "/pay", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ amount: amount })
+                })
+                    .then(async (res) => {
+                        const data = await res.json().catch(() => ({}));
+                        if (res.ok) {
+                            closePayKasbonModal();
+                            // reload hanya bagian kasbon (tidak seluruh halaman)
+                            loadKasbon();
+                        } else if (res.status === 422 && data.errors) {
+                            const msg = (data.errors.amount && data.errors.amount[0])
+                                || (data.errors.sale && data.errors.sale[0])
+                                || 'Gagal menyimpan pembayaran.';
+                            payKasbonError.textContent = msg;
+                            payKasbonError.classList.remove('hidden');
+                        } else {
+                            payKasbonError.textContent = data.message || 'Gagal menyimpan pembayaran.';
+                            payKasbonError.classList.remove('hidden');
+                        }
+                    })
+                    .catch(() => {
+                        payKasbonError.textContent = 'Terjadi kesalahan jaringan.';
+                        payKasbonError.classList.remove('hidden');
+                    });
+            });
         }
 
         async function loadAll() {

@@ -12,7 +12,9 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('sale_id');
-            $table->unsignedBigInteger('product_id');
+
+            // 👉 BIKIN NULLABLE AGAR BISA nullOnDelete
+            $table->unsignedBigInteger('product_id')->nullable();
 
             $table->integer('qty');
             $table->decimal('price', 15, 2);    // harga per item saat transaksi
@@ -20,8 +22,14 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->foreign('sale_id')->references('id')->on('sales')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->restrictOnDelete();
+            $table->foreign('sale_id')
+                  ->references('id')->on('sales')
+                  ->onDelete('cascade');
+
+            // 👉 UBAH restrictOnDelete() MENJADI nullOnDelete()
+            $table->foreign('product_id')
+                  ->references('id')->on('products')
+                  ->nullOnDelete();
         });
     }
 

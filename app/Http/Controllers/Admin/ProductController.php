@@ -118,16 +118,13 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        // CEK: kalau produk sudah pernah dipakai di transaksi, jangan dihapus
-        if ($product->saleItems()->exists()) {
-            return back()->with('error', 'Produk ini sudah pernah dipakai di transaksi, sehingga tidak dapat dihapus. Untuk berhenti menjual, ubah stok atau nonaktifkan di aplikasi kasir.');
-        }
-
         try {
+            // hapus file gambar kalau ada
             if ($product->image_path) {
                 Storage::disk('public')->delete($product->image_path);
             }
 
+            // delete produk
             $product->delete();
 
             return redirect()

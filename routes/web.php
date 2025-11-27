@@ -56,4 +56,5 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
 
     // BAYAR KASBON
     Route::post('/kasbon/{sale}/pay', [AdminCustomerController::class, 'payKasbon'])->name('kasbon.pay');
+
 });

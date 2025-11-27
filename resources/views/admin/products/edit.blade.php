@@ -26,6 +26,7 @@
             </div>
         @endif
 
+        {{-- FORM UPDATE PRODUK --}}
         <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data"
               class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
             @csrf
@@ -103,33 +104,117 @@
                 <p class="mt-1 text-[10px] text-gray-400">Maks 2 MB, format: JPG, PNG.</p>
             </div>
 
-            <div class="flex flex-col gap-3 pt-2">
-                <div class="flex justify-end gap-2">
-                    <a href="{{ route('admin.products.index') }}"
-                       class="inline-flex items-center rounded-full border border-gray-200 px-5 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">
-                        Batal
-                    </a>
-                    <button type="submit"
-                            class="inline-flex items-center rounded-full bg-[#57A0D3] px-6 py-1.5 text-xs font-semibold text-white hover:bg-sky-600">
-                        Simpan Perubahan
-                    </button>
-                </div>
-
-                {{-- HAPUS PRODUK --}}
-                <div class="flex justify-between items-center border-t border-dashed border-red-200 pt-3 mt-1">
-                    <p class="text-[11px] text-gray-500">Butuh menghapus produk ini?</p>
-                    <form action="{{ route('admin.products.destroy', $product) }}" method="POST"
-                          onsubmit="return confirm('Yakin menghapus {{ $product->name }} ?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                                class="inline-flex items-center rounded-full bg-red-50 px-4 py-1.5 text-[11px] font-semibold text-red-600 hover:bg-red-100">
-                            <i class='bx bx-trash text-sm mr-1'></i>
-                            Hapus Produk
-                        </button>
-                    </form>
-                </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <a href="{{ route('admin.products.index') }}"
+                   class="inline-flex items-center rounded-full border border-gray-200 px-5 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">
+                    Batal
+                </a>
+                <button type="submit"
+                        class="inline-flex items-center rounded-full bg-[#57A0D3] px-6 py-1.5 text-xs font-semibold text-white hover:bg-sky-600">
+                    Simpan Perubahan
+                </button>
             </div>
         </form>
+
+        {{-- HAPUS PRODUK (FORM TERPISAH) --}}
+        <div class="rounded-2xl border border-red-100 bg-white p-4 shadow-sm mt-3">
+            <div class="flex justify-between items-center border-t border-dashed border-red-200 pt-3 mt-1">
+                <p class="text-[11px] text-gray-500">
+                    Butuh menghapus produk ini? Tindakan ini tidak bisa dibatalkan.
+                </p>
+
+                <form id="deleteProductForm"
+                      action="{{ route('admin.products.destroy', $product) }}"
+                      method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button"
+                            id="deleteProductButton"
+                            class="inline-flex items-center rounded-full bg-red-50 px-4 py-1.5 text-[11px] font-semibold text-red-600 hover:bg-red-100">
+                        <i class='bx bx-trash text-sm mr-1'></i>
+                        Hapus Produk
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- MODAL KONFIRMASI HAPUS PRODUK --}}
+    <div id="deleteConfirmModal"
+         class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center">
+        <div class="w-full max-w-sm mx-4 rounded-2xl bg-white p-5 shadow-xl">
+            <div class="flex items-start gap-3">
+                <div class="mt-1 flex h-9 w-9 items-center justify-center rounded-full bg-red-50">
+                    <i class='bx bx-error text-lg text-red-500'></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-sm font-semibold text-gray-800">
+                        Hapus produk ini?
+                    </h3>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Produk <span class="font-semibold text-gray-700">{{ $product->name }}</span> akan dihapus dari daftar.
+                        Jika produk sudah pernah dipakai di transaksi, riwayat transaksi tetap ada,
+                        tetapi produk ini tidak bisa digunakan lagi untuk penjualan baru.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-4 flex justify-end gap-2">
+                <button type="button"
+                        id="cancelDeleteBtn"
+                        class="inline-flex items-center rounded-full border border-gray-200 px-4 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">
+                    Batal
+                </button>
+                <button type="button"
+                        id="confirmDeleteBtn"
+                        class="inline-flex items-center rounded-full bg-red-500 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-600">
+                    Ya, hapus
+                </button>
+            </div>
+        </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const deleteForm   = document.getElementById('deleteProductForm');
+        const triggerBtn   = document.getElementById('deleteProductButton');
+        const modal        = document.getElementById('deleteConfirmModal');
+        const cancelBtn    = document.getElementById('cancelDeleteBtn');
+        const confirmBtn   = document.getElementById('confirmDeleteBtn');
+
+        if (!deleteForm || !triggerBtn || !modal) return;
+
+        const openModal = () => {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        const closeModal = () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        triggerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+
+        cancelBtn?.addEventListener('click', () => {
+            closeModal();
+        });
+
+        // klik area gelap di luar card = tutup modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        confirmBtn?.addEventListener('click', () => {
+            deleteForm.submit();
+        });
+    });
+</script>
+@endpush

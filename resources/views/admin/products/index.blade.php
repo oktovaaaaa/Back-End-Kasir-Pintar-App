@@ -53,7 +53,7 @@
             <a href="{{ route('admin.products.create') }}"
                class="inline-flex items-center gap-2 rounded-full bg-[#57A0D3] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-sky-600 transition">
                 <i class='bx bx-plus-circle text-base'></i>
-                <span>Tambah Produk (CRUD)</span>
+                <span>Tambah Produk</span>
             </a>
         </div>
     </div>
