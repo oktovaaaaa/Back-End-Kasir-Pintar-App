@@ -1,197 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Kasir Resto</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #ffffff 100%);
+            background-color: #f3f4f6;
             min-height: 100vh;
         }
 
-        .slide-in {
-            animation: slideIn 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateX(-20px);
+        /* warna utama project #57A0D3 */
+        .primary-bg {
+            background-color: #57A0D3;
         }
 
-        .slide-in-right {
-            animation: slideInRight 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateX(20px);
+        .primary-gradient {
+            background: linear-gradient(135deg, #57A0D3, #1D4ED8);
         }
 
-        .fade-in {
-            animation: fadeIn 1s ease-out forwards;
-            opacity: 0;
+        .form-input-custom {
+            background-color: #eff6ff;
+            border: 1px solid #57A0D3;
+            transition: all 0.2s ease;
         }
 
-        .bounce-in {
-            animation: bounceIn 0.8s ease-out forwards;
-            opacity: 0;
-        }
-
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
-            70% {
-                transform: scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .form-input:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        .form-input-custom:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(87, 160, 211, 0.3);
+            border-color: #1D4ED8;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            background: linear-gradient(135deg, #57A0D3, #1D4ED8);
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
-        }
-
-        .btn-secondary {
-            background: white;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .login-container {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-        }
-
-        .welcome-section {
-            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(87, 160, 211, 0.4);
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-4xl w-full login-container rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-        <!-- Left Side - Login Form -->
-        <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center slide-in">
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-800 mb-2 fade-in" style="animation-delay: 0.2s;">Sign in to Kasir Resto</h1>
-                <p class="text-gray-500 fade-in" style="animation-delay: 0.4s;">Access your admin dashboard</p>
+<body class="min-h-screen flex items-center justify-center px-4">
+
+<div class="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+
+    <!-- LEFT: ilustrasi + welcome -->
+    <div class="w-full md:w-1/2 primary-gradient text-white flex flex-col justify-center p-8 md:p-10 relative">
+        <div class="absolute -top-10 -left-10 w-32 h-32 rounded-full bg-white/10 blur-2xl"></div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-3xl"></div>
+
+        <div class="flex flex-col items-center text-center gap-6 relative z-10">
+            <div class="w-40 h-40 md:w-52 md:h-52 rounded-3xl bg-white/10 flex items-center justify-center overflow-hidden">
+                <img
+                    src="{{ asset('images/kasir_pintar.png') }}"
+                    alt="Kasir Pintar"
+                    class="w-full h-full object-contain"
+                >
             </div>
 
-            @if ($errors->any())
-                <div class="mb-6 p-4 bg-red-50 text-red-700 rounded-lg bounce-in">
-                    {{ $errors->first() }}
-                </div>
-            @endif
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">
+                    Selamat Datang di Kasir Pintar
+                </h2>
+                <p class="text-sm md:text-base text-blue-100">
+                    Pantau penjualan, kelola kasir, dan atur keuangan resto kamu
+                    dengan lebih rapi dan cepat.
+                </p>
+            </div>
 
-            <form method="POST" action="{{ route('admin.login.post') }}" class="space-y-6">
-                @csrf
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-gray-700 mb-2">Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required
-                               class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300">
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-700 mb-2">Password</label>
-                        <input type="password" name="password" required
-                               class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300">
-                    </div>
-                </div>
-
-                <div class="flex items-center">
-                    <input type="checkbox" id="remember" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                    <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
-                </div>
-
-                <button type="submit" class="btn-primary w-full py-3 px-4 text-white font-medium rounded-lg mt-6">
-                    SIGN IN
-                </button>
-            </form>
-        </div>
-
-        <!-- Right Side - Welcome Message -->
-        <div class="w-full md:w-1/2 welcome-section text-white p-8 md:p-12 flex flex-col justify-center items-center text-center slide-in-right">
-            <div class="max-w-md">
-                <h2 class="text-4xl font-bold mb-6 fade-in" style="animation-delay: 0.6s;">Hello, Friend!</h2>
-                <p class="text-xl mb-8 fade-in" style="animation-delay: 0.8s;">Welcome back to Kasir Resto Admin Panel</p>
-                <div class="w-24 h-1 bg-white mx-auto mb-8 fade-in" style="animation-delay: 1s;"></div>
-                <p class="text-lg fade-in" style="animation-delay: 1.2s;">Manage your restaurant operations efficiently</p>
+            <div class="mt-4 text-xs md:text-sm text-blue-100/80">
+                “Dashboard untuk seluruh laporan dan kinerja kasir.”
             </div>
         </div>
     </div>
 
-    <script>
-        // Menambahkan sedikit interaktivitas
-        document.addEventListener('DOMContentLoaded', function() {
-            // Validasi form sederhana
-            const form = document.querySelector('form');
-            form.addEventListener('submit', function(e) {
-                const email = form.querySelector('input[type="email"]');
-                const password = form.querySelector('input[type="password"]');
+    <!-- RIGHT: form login -->
+    <div class="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center">
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                Login Admin
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">
+                Masuk ke dashboard admin menggunakan email dan password.
+            </p>
+        </div>
 
-                if (!email.value || !password.value) {
-                    e.preventDefault();
-                    alert('Please fill in all fields');
-                }
-            });
+        @if ($errors->any())
+            <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {{ $errors->first() }}
+            </div>
+        @endif
 
-            // Efek hover untuk input fields
-            const inputs = document.querySelectorAll('.form-input');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.classList.add('transform', 'scale-105');
-                    this.parentElement.classList.add('transition', 'duration-300');
-                });
+        <form method="POST" action="{{ route('admin.login.post') }}" class="space-y-5">
+            @csrf
 
-                input.addEventListener('blur', function() {
-                    this.parentElement.classList.remove('transform', 'scale-105');
-                });
-            });
-        });
-    </script>
+            {{-- Email --}}
+            <div class="space-y-1.5">
+                <label for="email" class="block text-sm font-medium text-gray-700">
+                    Email
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <!-- ikon email -->
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M4 4h16c.55 0 1 .45 1 1v14c0 .55-.45 1-1 1H4a1 1 0 0 1-1-1V5c0-.55.45-1 1-1z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="m4 7 8 5 8-5"/>
+                        </svg>
+                    </span>
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        required
+                        class="form-input-custom w-full rounded-xl py-3 pl-11 pr-3 text-sm text-gray-800"
+                        autocomplete="email"
+                        placeholder="Masukkan email"
+                    >
+                </div>
+            </div>
+
+            {{-- Password --}}
+            <div class="space-y-1.5">
+                <label for="password" class="block text-sm font-medium text-gray-700">
+                    Password
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <!-- ikon password -->
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <rect x="4" y="10" width="16" height="10" rx="2" ry="2"/>
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                        </svg>
+                    </span>
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        required
+                        class="form-input-custom w-full rounded-xl py-3 pl-11 pr-10 text-sm text-gray-800"
+                        autocomplete="current-password"
+                        placeholder="Masukkan password"
+                    >
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs md:text-sm">
+                <label class="inline-flex items-center gap-2 text-gray-600">
+                    <input
+                        id="remember"
+                        type="checkbox"
+                        name="remember"
+                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    >
+                    <span>Ingat saya</span>
+                </label>
+                {{-- kalau nanti ada fitur lupa password, tinggal aktifkan link di sini --}}
+                {{-- <a href="#" class="text-blue-600 hover:underline">Lupa password?</a> --}}
+            </div>
+
+            <button
+                type="submit"
+                class="btn-primary w-full rounded-xl py-3 text-sm md:text-base font-semibold text-white shadow-md"
+            >
+                Masuk
+            </button>
+
+            {{-- tidak ada login Google sesuai permintaan --}}
+        </form>
+    </div>
+</div>
+
 </body>
 </html>

@@ -115,7 +115,7 @@
         <div class="bg-slate-50 text-[11px] md:text-xs font-semibold text-slate-500 uppercase tracking-wide">
             <div class="grid grid-cols-12 gap-2 px-4 py-3">
                 <div class="col-span-5 md:col-span-4">Pelanggan</div>
-                <div class="col-span-4 md:col-span-4">Kontak</div>
+                <div class="col-span-4 md:col-span-4">Kontak & Instansi</div>
                 <div class="col-span-3 md:col-span-2 text-center">Total Utang</div>
                 <div class="hidden md:block md:col-span-2 text-center">Aksi</div>
             </div>
@@ -150,19 +150,26 @@
                         </div>
                         <div>
                             <div class="font-semibold text-slate-800">{{ $customer->name }}</div>
-                            @if($customer->note)
+                            @if($customer->company)
+                                <div class="text-[11px] text-slate-500">
+                                    {{ $customer->company }}
+                                </div>
+                            @elseif($customer->note)
                                 <div class="text-xs text-slate-500 line-clamp-1">{{ $customer->note }}</div>
                             @endif
                         </div>
                     </div>
 
-                    {{-- Kontak --}}
+                    {{-- Kontak + Instansi --}}
                     <div class="col-span-4 md:col-span-4 text-xs md:text-sm">
                         @if($customer->phone)
                             <div class="text-slate-800">{{ $customer->phone }}</div>
                         @endif
+                        @if($customer->email)
+                            <div class="text-slate-500">{{ $customer->email }}</div>
+                        @endif
                         @if($customer->address)
-                            <div class="text-slate-500 text-xs">{{ $customer->address }}</div>
+                            <div class="text-slate-500 text-[11px] mt-0.5">{{ $customer->address }}</div>
                         @endif
                     </div>
 
@@ -438,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
     rows.forEach(row => {
         row.addEventListener('click', function (e) {
             if (e.target.closest('button, form, input, textarea, i')) {
-                return; // jangan navigate kalau klik tombol/ikon
+                return;
             }
             const id = this.dataset.id;
             if (id) {
@@ -506,10 +513,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btnCloseCustomerModal) btnCloseCustomerModal.addEventListener('click', closeCustomerModal);
     if (btnCancelCustomer) btnCancelCustomer.addEventListener('click', closeCustomerModal);
 
-    // tombol edit
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', function (e) {
-            e.stopPropagation(); // biar gak ke-detail
+            e.stopPropagation();
             const row = this.closest('.customer-row');
             const customerData = {
                 id: row.dataset.customerId,
@@ -641,7 +647,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function openPayKasbonModal(saleId, total, paid, remaining, customerName) {
         paySaleIdInput.value = saleId;
         payRemainingRaw.value = remaining;
-        payAmountInput.value = remaining; // default = sisa kasbon
+        payAmountInput.value = remaining;
         payRemainingLabel.textContent = formatRupiah(remaining);
         payKasbonInfo.textContent = `Pelanggan: ${customerName} • Total ${formatRupiah(total)} • Sudah dibayar ${formatRupiah(paid)}`;
         payKasbonError.classList.add('hidden');

@@ -107,7 +107,7 @@
                      alt="profileImg" />
                 <div class="name_job">
                     <div class="name">{{ optional(auth('admin')->user())->name ?? 'Admin' }}</div>
-                    <div class="job">Administrator</div>
+                    <div class="job">Bos</div>
                 </div>
             </div>
 

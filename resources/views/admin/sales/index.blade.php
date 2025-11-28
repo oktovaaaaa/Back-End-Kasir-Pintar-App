@@ -1,3 +1,4 @@
+{{-- resources/views/admin/sales/index.blade.php --}}
 @extends('layouts.admin')
 
 @section('title', 'Riwayat Transaksi - Kasir Resto')
@@ -36,42 +37,17 @@
         });
     @endphp
 
-    {{-- SUMMARY & FILTER HEADER --}}
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-        <div class="lg:col-span-2 flex flex-col justify-between gap-3">
-            <div>
-                <h2 class="text-xl font-bold text-gray-800">Ringkasan Penjualan</h2>
-                <p class="text-xs text-gray-500 mt-1">
-                    Lihat riwayat transaksi kasir: lunas maupun kasbon.
-                </p>
-            </div>
+    {{-- HEADER JUDUL --}}
+    <div class="mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Ringkasan Penjualan</h2>
+        <p class="text-xs text-gray-500 mt-1">
+            Lihat riwayat transaksi kasir: lunas maupun kasbon.
+        </p>
+    </div>
 
-            {{-- Tab filter: Semua / Lunas / Utang --}}
-            <div class="max-w-md">
-                <div
-                    class="flex items-center bg-[#E8F2FF] rounded-full p-1 shadow-sm text-[12px]"
-                    id="filterTabsWrapper">
-                    <button type="button"
-                            data-filter="all"
-                            class="flex-1 px-3 py-1.5 rounded-full text-center font-semibold bg-white text-[#57A0D3] shadow">
-                        Semua
-                    </button>
-                    <button type="button"
-                            data-filter="paid"
-                            class="flex-1 px-3 py-1.5 rounded-full text-center text-gray-600 font-medium">
-                        Lunas
-                    </button>
-                    <button type="button"
-                            data-filter="kasbon"
-                            class="flex-1 px-3 py-1.5 rounded-full text-center text-gray-600 font-medium">
-                        Utang
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        {{-- Summary cards --}}
-        <div class="grid grid-cols-2 gap-3 lg:col-span-2">
+    {{-- SUMMARY CARDS --}}
+    <div class="mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
             {{-- Total transaksi --}}
             <div class="rounded-2xl p-4 bg-gradient-to-r from-[#57A0D3] to-sky-500 text-white shadow-md">
                 <p class="text-[11px] uppercase tracking-wide font-semibold opacity-90">Total Transaksi</p>
@@ -112,6 +88,64 @@
         </div>
     </div>
 
+    {{-- SECTION LIST + SEARCH + FILTER --}}
+    <div class="mb-5 space-y-3">
+        <div>
+            <h3 class="text-sm sm:text-base font-semibold text-gray-800">Daftar Transaksi</h3>
+            <p class="text-xs text-gray-500 mt-0.5">
+                Kelola riwayat transaksi, status pembayaran, dan kasbon pelanggan.
+            </p>
+        </div>
+
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            {{-- Search di bawah card, full width di kiri --}}
+            <div class="w-full md:max-w-md">
+                <div
+                    class="flex items-center gap-2 px-3 py-2 rounded-full bg-white border border-gray-200 shadow-sm
+                           focus-within:ring-1 focus-within:ring-[#57A0D3] focus-within:border-[#57A0D3] transition">
+                    <i class='bx bx-search text-gray-400 text-lg'></i>
+                    <input
+                        id="salesSearchInput"
+                        type="text"
+                        class="w-full bg-transparent border-none text-xs sm:text-sm focus:outline-none focus:ring-0"
+                        placeholder="Cari transaksi (pelanggan, ID, status, nominal)...">
+                    <button
+                        id="salesSearchClearBtn"
+                        type="button"
+                        class="hidden text-[11px] text-gray-500 hover:text-gray-700">
+                        Reset
+                    </button>
+                </div>
+                <p id="salesSearchHint" class="mt-1 text-[10px] text-gray-400">
+                    Bisa cari berdasarkan nama pelanggan, ID transaksi, status, atau jumlah.
+                </p>
+            </div>
+
+            {{-- Tab filter di kanan --}}
+            <div class="w-full md:w-auto">
+                <div
+                    id="filterTabsWrapper"
+                    class="flex items-center bg-[#E8F2FF] rounded-full p-1 shadow-sm text-[12px] md:ml-auto w-full md:w-auto">
+                    <button type="button"
+                            data-filter="all"
+                            class="flex-1 md:flex-none px-3 py-1.5 rounded-full text-center font-semibold bg-white text-[#57A0D3] shadow">
+                        Semua
+                    </button>
+                    <button type="button"
+                            data-filter="paid"
+                            class="flex-1 md:flex-none px-3 py-1.5 rounded-full text-center text-gray-600 font-medium">
+                        Lunas
+                    </button>
+                    <button type="button"
+                            data-filter="kasbon"
+                            class="flex-1 md:flex-none px-3 py-1.5 rounded-full text-center text-gray-600 font-medium">
+                        Utang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- LIST / EMPTY STATE --}}
     <div id="salesEmptyState" class="{{ $sales->isEmpty() ? '' : 'hidden' }}">
         <div
@@ -126,9 +160,22 @@
         </div>
     </div>
 
+    {{-- EMPTY STATE KHUSUS FILTER + SEARCH --}}
+    <div id="salesFilteredEmptyState" class="hidden">
+        <div
+            class="w-full flex flex-col items-center justify-center py-10 bg-white rounded-2xl border border-dashed border-gray-300">
+            <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
+                <i class='bx bx-search-alt text-amber-500 text-2xl'></i>
+            </div>
+            <p class="text-sm font-semibold text-gray-700">Tidak ada transaksi yang cocok</p>
+            <p class="text-xs text-gray-500 mt-1 text-center max-w-sm">
+                Coba ubah kata kunci pencarian atau filter status untuk melihat transaksi lainnya.
+            </p>
+        </div>
+    </div>
+
     <div id="salesListWrapper" class="{{ $sales->isEmpty() ? 'hidden' : '' }}">
-        <div id="salesList"
-             class="space-y-3">
+        <div id="salesList" class="space-y-3">
             {{-- akan di-render via JS --}}
         </div>
     </div>
@@ -199,10 +246,10 @@
 @push('scripts')
     <script>
         const PRIMARY_BLUE = '#57A0D3';
-
         const ALL_SALES = @json($salesArray);
 
         let currentFilter = 'all';
+        let currentSearch = '';
 
         const currencyFormatter = new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -231,26 +278,62 @@
             };
         }
 
+        function normalize(str) {
+            return (str || '').toString().toLowerCase();
+        }
+
+        function matchesSearch(sale, keyword) {
+            if (!keyword) return true;
+            const q = normalize(keyword);
+
+            const fields = [
+                sale.id?.toString(),
+                sale.customer_name,
+                sale.status,
+                sale.created_at_label,
+                sale.total_amount?.toString(),
+                sale.paid_amount?.toString(),
+                sale.remaining?.toString(),
+            ];
+
+            return fields.some(f => normalize(f).includes(q));
+        }
+
         function renderSales() {
             const listEl = document.getElementById('salesList');
             const emptyEl = document.getElementById('salesEmptyState');
+            const filteredEmptyEl = document.getElementById('salesFilteredEmptyState');
             const wrapperEl = document.getElementById('salesListWrapper');
 
             let filtered = ALL_SALES.filter(s => {
-                if (currentFilter === 'paid') return s.status === 'paid';
-                if (currentFilter === 'kasbon') return s.status === 'kasbon';
+                if (currentFilter === 'paid' && s.status !== 'paid') return false;
+                if (currentFilter === 'kasbon' && s.status !== 'kasbon') return false;
+                if (!matchesSearch(s, currentSearch)) return false;
                 return true;
             });
 
             document.getElementById('summary-filter-count').textContent =
                 'Ditampilkan ' + filtered.length + ' transaksi';
 
-            if (!filtered.length) {
+            const hasOriginalData = ALL_SALES.length > 0;
+            const hasSearchOrFilter = currentFilter !== 'all' || (currentSearch && currentSearch.trim() !== '');
+
+            if (!hasOriginalData) {
                 emptyEl.classList.remove('hidden');
+                filteredEmptyEl.classList.add('hidden');
                 wrapperEl.classList.add('hidden');
                 return;
             }
+
+            if (!filtered.length && hasSearchOrFilter) {
+                emptyEl.classList.add('hidden');
+                filteredEmptyEl.classList.remove('hidden');
+                wrapperEl.classList.add('hidden');
+                return;
+            }
+
             emptyEl.classList.add('hidden');
+            filteredEmptyEl.classList.add('hidden');
             wrapperEl.classList.remove('hidden');
 
             let html = '';
@@ -361,6 +444,28 @@
             document.getElementById('saleDetailModal').classList.add('hidden');
         }
 
+        function handleSearchInput() {
+            const input = document.getElementById('salesSearchInput');
+            const clearBtn = document.getElementById('salesSearchClearBtn');
+            currentSearch = input.value || '';
+
+            if (currentSearch.trim() !== '') {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            renderSales();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('salesSearchInput');
+            input.value = '';
+            currentSearch = '';
+            document.getElementById('salesSearchClearBtn').classList.add('hidden');
+            renderSales();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             setActiveFilterTab();
             renderSales();
@@ -374,6 +479,21 @@
                         renderSales();
                     });
                 });
+            }
+
+            const searchInput = document.getElementById('salesSearchInput');
+            const clearBtn = document.getElementById('salesSearchClearBtn');
+            if (searchInput) {
+                searchInput.addEventListener('input', handleSearchInput);
+                searchInput.addEventListener('keyup', (e) => {
+                    if (e.key === 'Escape') {
+                        clearSearch();
+                        searchInput.blur();
+                    }
+                });
+            }
+            if (clearBtn) {
+                clearBtn.addEventListener('click', clearSearch);
             }
         });
     </script>

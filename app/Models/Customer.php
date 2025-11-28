@@ -14,6 +14,7 @@ class Customer extends Model
         'phone',
         'email',
         'address',
+        'company', // <-- INI YANG TADI HILANG
         'note',
     ];
 

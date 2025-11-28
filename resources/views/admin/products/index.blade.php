@@ -59,15 +59,17 @@
     </div>
 
     {{-- HEADER + SUMMARY --}}
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-        <div class="lg:col-span-2 flex flex-col justify-between gap-3">
+    <div class="mb-6 space-y-4">
+        {{-- HEADER + FILTER --}}
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div>
                 <h2 class="text-xl font-bold text-gray-800">Monitoring Stok Produk</h2>
                 <p class="text-xs text-gray-500 mt-1">
                     Pantau jumlah stok, harga jual, dan modal produk di toko Anda.
                 </p>
             </div>
-            <div class="flex flex-col sm:flex-row gap-3">
+
+            <div class="flex flex-col sm:flex-row gap-3 lg:w-1/2">
                 <div class="flex-1">
                     <label class="text-[11px] font-semibold text-gray-500">Pencarian</label>
                     <div
@@ -94,13 +96,16 @@
             </div>
         </div>
 
-        {{-- SUMMARY CARDS --}}
-        <div class="grid grid-cols-2 gap-3 lg:col-span-2">
+        {{-- SUMMARY CARDS: nyamping dulu baru turun --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div class="rounded-2xl p-4 bg-gradient-to-r from-[#57A0D3] to-sky-500 text-white shadow-md">
                 <p class="text-[11px] uppercase tracking-wide font-semibold opacity-90">Total Produk</p>
                 <p id="summary-total-products" class="mt-2 text-2xl font-extrabold">{{ $products->count() }}</p>
-                <p class="mt-1 text-[11px] opacity-80" id="summary-filter-count">Ditampilkan {{ $products->count() }} produk</p>
+                <p class="mt-1 text-[11px] opacity-80" id="summary-filter-count">
+                    Ditampilkan {{ $products->count() }} produk
+                </p>
             </div>
+
             <div class="rounded-2xl p-4 bg-white border border-[#57A0D3]/20 shadow-sm flex flex-col">
                 <p class="text-[11px] uppercase tracking-wide font-semibold text-gray-500">Total Stok</p>
                 <p id="summary-total-stock" class="mt-2 text-2xl font-extrabold text-[#57A0D3]">
@@ -108,6 +113,7 @@
                 </p>
                 <p class="mt-1 text-[11px] text-gray-400">Akumulasi semua produk</p>
             </div>
+
             <div class="rounded-2xl p-4 bg-white border border-amber-300/60 shadow-sm flex flex-col">
                 <p class="text-[11px] uppercase tracking-wide font-semibold text-amber-700">Stok Menipis</p>
                 @php
@@ -118,6 +124,7 @@
                 </p>
                 <p class="mt-1 text-[11px] text-amber-700/80">Stok &le; 5 pcs</p>
             </div>
+
             <div class="rounded-2xl p-4 bg-white border border-red-300/60 shadow-sm flex flex-col">
                 <p class="text-[11px] uppercase tracking-wide font-semibold text-red-700">Habis</p>
                 @php

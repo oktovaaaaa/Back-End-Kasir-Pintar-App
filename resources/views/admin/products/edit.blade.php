@@ -5,6 +5,20 @@
 @section('page-title', 'Edit Produk')
 
 @section('content')
+    @php
+        // Siapkan nilai tampilan harga (pakai titik) sekali di atas
+        $costOld   = old('cost_price');
+        $priceOld  = old('price');
+
+        $costDisplay  = $costOld !== null
+            ? $costOld
+            : number_format($product->cost_price, 0, ',', '.');
+
+        $priceDisplay = $priceOld !== null
+            ? $priceOld
+            : number_format($product->price, 0, ',', '.');
+    @endphp
+
     <div class="max-w-3xl mx-auto space-y-6">
         <div class="flex items-center justify-between gap-2">
             <div>
@@ -79,13 +93,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="text-xs font-semibold text-gray-700">Harga Modal</label>
-                    <input type="number" name="cost_price" min="0" value="{{ old('cost_price', $product->cost_price) }}"
+                    <input type="text" name="cost_price" id="cost_price"
+                           value="{{ $costDisplay }}"
+                           placeholder="Contoh: 10.000"
                            class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-[#57A0D3] focus:ring-[#57A0D3]"
                            required>
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-gray-700">Harga Jual</label>
-                    <input type="number" name="price" min="0" value="{{ old('price', $product->price) }}"
+                    <input type="text" name="price" id="price"
+                           value="{{ $priceDisplay }}"
+                           placeholder="Contoh: 15.000"
                            class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-[#57A0D3] focus:ring-[#57A0D3]"
                            required>
                 </div>
@@ -177,6 +195,16 @@
 
 @push('scripts')
 <script>
+    // helper untuk format angka menjadi 10.000 dst.
+    function formatRupiahInput(el) {
+        let value = el.value.replace(/[^0-9]/g, '');
+        if (value === '') {
+            el.value = '';
+            return;
+        }
+        el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const deleteForm   = document.getElementById('deleteProductForm');
         const triggerBtn   = document.getElementById('deleteProductButton');
@@ -184,37 +212,55 @@
         const cancelBtn    = document.getElementById('cancelDeleteBtn');
         const confirmBtn   = document.getElementById('confirmDeleteBtn');
 
-        if (!deleteForm || !triggerBtn || !modal) return;
+        if (deleteForm && triggerBtn && modal) {
+            const openModal = () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            };
 
-        const openModal = () => {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        };
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
 
-        const closeModal = () => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
+            triggerBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModal();
+            });
 
-        triggerBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal();
-        });
-
-        cancelBtn?.addEventListener('click', () => {
-            closeModal();
-        });
-
-        // klik area gelap di luar card = tutup modal
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
+            cancelBtn?.addEventListener('click', () => {
                 closeModal();
-            }
-        });
+            });
 
-        confirmBtn?.addEventListener('click', () => {
-            deleteForm.submit();
-        });
+            // klik area gelap di luar card = tutup modal
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            confirmBtn?.addEventListener('click', () => {
+                deleteForm.submit();
+            });
+        }
+
+        // === Format input harga (modal & jual) dengan titik ===
+        const costInput  = document.getElementById('cost_price');
+        const priceInput = document.getElementById('price');
+
+        if (costInput) {
+            formatRupiahInput(costInput); // format nilai awal (old / dari DB)
+            costInput.addEventListener('input', function () {
+                formatRupiahInput(this);
+            });
+        }
+
+        if (priceInput) {
+            formatRupiahInput(priceInput); // format nilai awal
+            priceInput.addEventListener('input', function () {
+                formatRupiahInput(this);
+            });
+        }
     });
 </script>
 @endpush

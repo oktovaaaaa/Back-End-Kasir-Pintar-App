@@ -62,15 +62,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="text-xs font-semibold text-gray-700">Harga Modal</label>
-                    <input type="number" name="cost_price" min="0" value="{{ old('cost_price') }}"
-                           placeholder="Contoh: 10000"
+                    <input type="text" name="cost_price" id="cost_price"
+                           value="{{ old('cost_price') }}"
+                           placeholder="Contoh: 10.000"
                            class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-[#57A0D3] focus:ring-[#57A0D3]"
                            required>
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-gray-700">Harga Jual</label>
-                    <input type="number" name="price" min="0" value="{{ old('price') }}"
-                           placeholder="Contoh: 15000"
+                    <input type="text" name="price" id="price"
+                           value="{{ old('price') }}"
+                           placeholder="Contoh: 15.000"
                            class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-[#57A0D3] focus:ring-[#57A0D3]"
                            required>
                 </div>
@@ -102,4 +104,34 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function formatRupiahInput(el) {
+            let value = el.value.replace(/[^0-9]/g, '');
+            if (value === '') {
+                el.value = '';
+                return;
+            }
+            el.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const costInput = document.getElementById('cost_price');
+            const priceInput = document.getElementById('price');
+
+            if (costInput) {
+                formatRupiahInput(costInput); // format ulang nilai old()
+                costInput.addEventListener('input', function () {
+                    formatRupiahInput(this);
+                });
+            }
+
+            if (priceInput) {
+                formatRupiahInput(priceInput); // format ulang nilai old()
+                priceInput.addEventListener('input', function () {
+                    formatRupiahInput(this);
+                });
+            }
+        });
+    </script>
 @endsection

@@ -13,7 +13,7 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'okto@gmail.com'],
             [
-                'name' => 'Owner Resto',
+                'name' => 'Oktova ',
                 'phone' => '081234567890',
                 'birth_date' => '1990-01-01',
                 'profile_photo' => null,

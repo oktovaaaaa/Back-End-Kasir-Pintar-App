@@ -11,17 +11,19 @@
         Terjadi kesalahan saat memuat data laporan. Silakan coba lagi.
     </div>
 
-    {{-- TOP: judul + filter periode + switch chart --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <div class="lg:col-span-2 flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800">Overview Laporan</h2>
-                    <p class="text-xs text-gray-500">
-                        Ringkasan omzet dan keuntungan berdasarkan periode.
-                    </p>
-                </div>
-                <div class="flex items-center gap-2">
+    {{-- TOP: judul + filter periode + switch chart + summary cards --}}
+    <div class="mb-6 space-y-4">
+        {{-- Judul + filter + switch chart --}}
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">Overview Laporan</h2>
+                <p class="text-xs text-gray-500">
+                    Ringkasan omzet dan keuntungan berdasarkan periode.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 lg:w-1/2 lg:justify-end">
+                <div class="flex items-center justify-start sm:justify-end">
                     <select id="periodFilter"
                             class="border border-[#57A0D3]/60 text-xs rounded-full px-3 py-1.5
                                    focus:outline-none focus:ring-2 focus:ring-[#57A0D3] focus:border-[#57A0D3]">
@@ -31,23 +33,23 @@
                         <option value="yearly">Tahunan</option>
                     </select>
                 </div>
-            </div>
 
-            {{-- Switch Line / Bar --}}
-            <div class="inline-flex bg-[#E8F2FF] rounded-full p-1 w-max">
-                <button id="chartLineBtn"
-                        class="chart-type-btn px-4 py-1.5 text-xs font-semibold rounded-full bg-white text-[#57A0D3] shadow">
-                    Line Chart
-                </button>
-                <button id="chartBarBtn"
-                        class="chart-type-btn px-4 py-1.5 text-xs font-semibold rounded-full text-[#57A0D3]/70">
-                    Bar Chart
-                </button>
+                {{-- Switch Line / Bar --}}
+                <div class="inline-flex bg-[#E8F2FF] rounded-full p-1 w-max">
+                    <button id="chartLineBtn"
+                            class="chart-type-btn px-4 py-1.5 text-xs font-semibold rounded-full bg-white text-[#57A0D3] shadow">
+                        Line Chart
+                    </button>
+                    <button id="chartBarBtn"
+                            class="chart-type-btn px-4 py-1.5 text-xs font-semibold rounded-full text-[#57A0D3]/70">
+                        Bar Chart
+                    </button>
+                </div>
             </div>
         </div>
 
-        {{-- Kartu kecil total atas --}}
-        <div class="grid grid-cols-2 gap-3">
+        {{-- Summary cards: nyamping dulu baru ke bawah --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
             <div class="rounded-xl bg-white shadow-sm border border-[#57A0D3]/20 p-3 flex flex-col">
                 <span class="text-[11px] text-gray-500 font-semibold">Total Penjualan</span>
                 <span id="summary-total-sales" class="mt-1 text-lg font-extrabold text-[#57A0D3]">
@@ -61,6 +63,16 @@
                     Rp 0
                 </span>
                 <span class="mt-auto text-[10px] text-gray-400">Setelah dikurangi modal</span>
+            </div>
+            <div class="rounded-xl bg-white shadow-sm border border-gray-100 p-3 flex flex-col">
+                <p class="text-[11px] text-gray-500 font-semibold">Transaksi</p>
+                <p id="card-total-trx" class="mt-1 text-lg font-bold text-gray-800">0</p>
+                <span class="mt-auto text-[10px] text-gray-400">Jumlah transaksi pada periode</span>
+            </div>
+            <div class="rounded-xl bg-white shadow-sm border border-gray-100 p-3 flex flex-col">
+                <p class="text-[11px] text-gray-500 font-semibold">Produk Terjual</p>
+                <p id="card-total-qty" class="mt-1 text-lg font-bold text-gray-800">0</p>
+                <span class="mt-auto text-[10px] text-gray-400">Total item terjual</span>
             </div>
         </div>
     </div>
@@ -117,7 +129,7 @@
             </div>
         </div>
 
-        {{-- Kartu kecil mirip template: omzet/profit/qty/trx --}}
+        {{-- Kartu kecil mirip template: omzet/profit --}}
         <div class="space-y-3">
             <div class="rounded-2xl p-4 bg-gradient-to-r from-[#57A0D3] to-sky-500 text-white shadow-md">
                 <p class="text-[11px] uppercase font-semibold opacity-80">Omzet Bulan Ini</p>
@@ -128,16 +140,6 @@
                 <p class="text-[11px] uppercase font-semibold opacity-80">Keuntungan</p>
                 <p id="card-total-profit" class="mt-1 text-2xl font-extrabold">Rp 0</p>
                 <p class="mt-1 text-[11px] opacity-80">Setelah modal</p>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white shadow-sm border border-gray-100 p-3">
-                    <p class="text-[11px] text-gray-500 font-semibold">Transaksi</p>
-                    <p id="card-total-trx" class="mt-1 text-lg font-bold text-gray-800">0</p>
-                </div>
-                <div class="rounded-xl bg-white shadow-sm border border-gray-100 p-3">
-                    <p class="text-[11px] text-gray-500 font-semibold">Produk Terjual</p>
-                    <p id="card-total-qty" class="mt-1 text-lg font-bold text-gray-800">0</p>
-                </div>
             </div>
         </div>
     </div>
@@ -231,7 +233,7 @@
                     <th class="px-4 py-2 text-right">Sisa</th>
                     <th class="px-4 py-2 text-left">Tanggal</th>
                     <th class="px-4 py-2 text-center">Status</th>
-                    <th class="px-4 py-2 text-center">Aksi</th> {{-- kolom baru --}}
+                    <th class="px-4 py-2 text-center">Aksi</th>
                 </tr>
                 </thead>
                 <tbody id="kasbon-body">
@@ -672,7 +674,7 @@
             });
         }
 
-        // ==== MODAL BAYAR KASBON (logic hampir sama dgn halaman pelanggan) ====
+        // ==== MODAL BAYAR KASBON ====
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         const payKasbonModal = document.getElementById('payKasbonModal');
