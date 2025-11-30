@@ -14,10 +14,20 @@ use Illuminate\Validation\ValidationException;
 
 class SaleController extends Controller
 {
-    // GET /api/sales → riwayat transaksi sederhana
+    // =========================================
+    // GET /api/sales → riwayat transaksi
+    // =========================================
     public function index()
     {
+        $userId = Auth::id();
+
+        if (!$userId) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
         $sales = Sale::with(['customer', 'items.product'])
+            ->where('user_id', $userId)     // filter per kasir yg login
+            // ->whereNotNull('customer_id') // JANGAN pakai filter ini kalau mau semua transaksi
             ->orderBy('created_at', 'desc')
             ->limit(50)
             ->get();
@@ -25,21 +35,32 @@ class SaleController extends Controller
         return response()->json($sales);
     }
 
-    // GET /api/sales/{id} → detail 1 transaksi (untuk kasbon / riwayat)
+    // =========================================
+    // GET /api/sales/{id} → detail 1 transaksi
+    // =========================================
     public function show($id)
     {
+        $userId = Auth::id();
+
+        if (!$userId) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
         $sale = Sale::with(['customer', 'items.product'])
+            ->where('user_id', $userId)
             ->findOrFail($id);
 
         return response()->json($sale);
     }
 
-    // POST /api/sales → buat transaksi baru (lunas / kasbon)
+    // =========================================
+    // POST /api/sales → buat transaksi baru
+    // =========================================
     public function store(Request $request)
     {
         $data = $request->validate([
             'customer_id'   => 'nullable|exists:customers,id',
-            'customer_name' => 'nullable|string|max:255', // dari Flutter kalau belum terdaftar
+            'customer_name' => 'nullable|string|max:255',
 
             'items'               => 'required|array|min:1',
             'items.*.product_id'  => 'required|exists:products,id',
@@ -73,16 +94,16 @@ class SaleController extends Controller
                     ]);
                 }
 
-                $price     = $product->price;       // harga jual
-                $costPrice = $product->cost_price;  // harga modal
-                $subtotal  = $price * $qty;         // total jual
+                $price     = $product->price;
+                $costPrice = $product->cost_price;
+                $subtotal  = $price * $qty;
                 $total    += $subtotal;
 
                 $saleItemsData[] = [
                     'product_id' => $product->id,
                     'qty'        => $qty,
                     'price'      => $price,
-                    'cost_price' => $costPrice,  // simpan modal per unit saat transaksi
+                    'cost_price' => $costPrice,
                     'subtotal'   => $subtotal,
                 ];
 
@@ -115,13 +136,13 @@ class SaleController extends Controller
                 }
             }
 
-            // simpan snapshot nama pelanggan (biar history tetap kebaca kalau nama berubah)
+            // snapshot nama pelanggan (buat history)
             $customerNameSnapshot = null;
             if ($customerId) {
                 $customer = Customer::find($customerId);
                 $customerNameSnapshot = $customer?->name;
             } elseif ($customerName) {
-                // kalau lunas tapi tetap mau simpan nama di snapshot (opsional)
+                // lunas tanpa customer_id tapi tetap simpan nama (kalau dikirim)
                 $customerNameSnapshot = $customerName;
             }
 
@@ -144,72 +165,67 @@ class SaleController extends Controller
                 SaleItem::create($itemData);
             }
 
-            // load relasi untuk response ke Flutter
             $sale->load(['customer', 'items.product']);
 
             return response()->json($sale, 201);
         });
     }
 
-    /**
-     * POST /api/sales/{id}/pay-kasbon
-     * Melunasi / mencicil kasbon.
-     *
-     * Request:
-     *  - amount: nominal yang dibayar sekarang
-     */
-  public function payKasbon(Request $request, $id)
-{
-    $data = $request->validate([
-        'amount' => 'required|numeric|min:1',
-    ]);
-
-    $userId = Auth::id();
-    if (!$userId) {
-        return response()->json(['message' => 'Unauthenticated'], 401);
-    }
-
-    return DB::transaction(function () use ($id, $data) {
-        /** @var Sale $sale */
-        $sale = Sale::lockForUpdate()->findOrFail($id);
-
-        if ($sale->status !== 'kasbon') {
-            throw ValidationException::withMessages([
-                'sale' => ['Transaksi ini sudah lunas, tidak bisa dibayar lagi.'],
-            ]);
-        }
-
-        $remaining = $sale->total_amount - $sale->paid_amount;
-        if ($remaining <= 0) {
-            throw ValidationException::withMessages([
-                'amount' => ['Kasbon sudah lunas.'],
-            ]);
-        }
-
-        $amount = (float) $data['amount'];
-        if ($amount > $remaining) {
-            throw ValidationException::withMessages([
-                'amount' => ['Nominal tidak boleh melebihi sisa kasbon (' . $remaining . ').'],
-            ]);
-        }
-
-        $sale->paid_amount += $amount;
-        $sale->change_amount = 0;
-
-        if ($sale->paid_amount >= $sale->total_amount) {
-            $sale->status = 'paid';
-        }
-
-        $sale->save();
-        $sale->refresh();
-
-        $newRemaining = max(0, $sale->total_amount - $sale->paid_amount);
-
-        return response()->json([
-            'message'   => 'Pembayaran kasbon berhasil disimpan.',
-            'sale'      => $sale->load(['customer', 'items.product']),
-            'remaining' => $newRemaining,
+    // =========================================
+    // POST /api/sales/{id}/pay-kasbon → cicil / lunasi kasbon
+    // =========================================
+    public function payKasbon(Request $request, $id)
+    {
+        $data = $request->validate([
+            'amount' => 'required|numeric|min:1',
         ]);
-    });
-}
+
+        $userId = Auth::id();
+        if (!$userId) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        return DB::transaction(function () use ($id, $data) {
+            /** @var Sale $sale */
+            $sale = Sale::lockForUpdate()->findOrFail($id);
+
+            if ($sale->status !== 'kasbon') {
+                throw ValidationException::withMessages([
+                    'sale' => ['Transaksi ini sudah lunas, tidak bisa dibayar lagi.'],
+                ]);
+            }
+
+            $remaining = $sale->total_amount - $sale->paid_amount;
+            if ($remaining <= 0) {
+                throw ValidationException::withMessages([
+                    'amount' => ['Kasbon sudah lunas.'],
+                ]);
+            }
+
+            $amount = (float) $data['amount'];
+            if ($amount > $remaining) {
+                throw ValidationException::withMessages([
+                    'amount' => ['Nominal tidak boleh melebihi sisa kasbon (' . $remaining . ').'],
+                ]);
+            }
+
+            $sale->paid_amount += $amount;
+            $sale->change_amount = 0;
+
+            if ($sale->paid_amount >= $sale->total_amount) {
+                $sale->status = 'paid';
+            }
+
+            $sale->save();
+            $sale->refresh();
+
+            $newRemaining = max(0, $sale->total_amount - $sale->paid_amount);
+
+            return response()->json([
+                'message'   => 'Pembayaran kasbon berhasil disimpan.',
+                'sale'      => $sale->load(['customer', 'items.product']),
+                'remaining' => $newRemaining,
+            ]);
+        });
+    }
 }

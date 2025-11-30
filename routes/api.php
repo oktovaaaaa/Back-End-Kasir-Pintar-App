@@ -20,6 +20,15 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [ApiAuthController::class, 'logout']);
         Route::get('/me', [ApiAuthController::class, 'me']);
+
+        // ✅ UPDATE PROFIL (PUT /api/auth/me)
+        Route::put('/me', [ApiAuthController::class, 'updateProfile']);
+
+        // ✅ UPDATE & HAPUS FOTO PROFIL
+        // POST /api/auth/profile/photo
+        Route::post('/profile/photo', [ApiAuthController::class, 'updatePhoto']);
+        // DELETE /api/auth/profile/photo
+        Route::delete('/profile/photo', [ApiAuthController::class, 'deletePhoto']);
     });
 });
 
